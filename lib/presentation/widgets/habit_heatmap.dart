@@ -41,7 +41,7 @@ class HabitHeatmap extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: weeks <= 0 ? 0 : (cellSize * 7 + cellGap * 6),
+          height: weeks <= 0 ? 0 : (cellSize * 7 + cellGap * 6) + 4,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             reverse: true,

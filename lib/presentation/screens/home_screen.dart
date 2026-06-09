@@ -35,8 +35,15 @@ class HomeScreen extends StatelessWidget {
               .where((h) => state.isCompletedOn(h.id, selectedDate))
               .length;
 
-          return CustomScrollView(
-            slivers: [
+          return RefreshIndicator(
+            onRefresh: () async {
+              final bloc = context.read<HabitsBloc>();
+              bloc.add(const HabitsRefreshed());
+              await bloc.stream.firstWhere((s) => s.status == HabitsStatus.loaded);
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -139,6 +146,7 @@ class HomeScreen extends StatelessWidget {
               const SliverToBoxAdapter(child: MotivationalQuote()),
               const SliverToBoxAdapter(child: SizedBox(height: 90)),
             ],
+            ),
           );
         },
       ),

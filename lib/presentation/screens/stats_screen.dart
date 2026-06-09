@@ -318,7 +318,7 @@ class _SummaryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.7,
+      childAspectRatio: 1.3,
       children: [
         for (var i = 0; i < cards.length; i++)
           cards[i].animate().fadeIn(duration: 320.ms, delay: (i * 60).ms).scale(

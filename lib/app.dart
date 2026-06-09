@@ -5,10 +5,13 @@ import 'package:pratik_app_kit/pratik_app_kit.dart';
 import 'core/theme/habitforge_colors.dart';
 import 'data/repositories/habit_repository.dart';
 import 'logic/blocs/habits/habits_bloc.dart';
+import 'presentation/screens/intro_screen.dart';
 import 'presentation/screens/root_shell.dart';
 
 class HabitForgeApp extends StatelessWidget {
-  const HabitForgeApp({super.key});
+  const HabitForgeApp({super.key, this.showIntro = false});
+
+  final bool showIntro;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,7 @@ class HabitForgeApp extends StatelessWidget {
             themeMode: themeMode,
             theme: AppThemeBuilder.buildLight(HabitForgeColors(), fontFamily: 'Nunito'),
             darkTheme: AppThemeBuilder.buildDark(HabitForgeDarkColors(), fontFamily: 'Nunito'),
-            home: const RootShell(),
+            home: showIntro ? const IntroScreen() : const RootShell(),
           );
         },
       ),

@@ -7,9 +7,15 @@ abstract class HabitsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Loads all habits + completions from storage.
+/// Loads all habits + completions from storage (shows a loading spinner).
 class HabitsLoaded extends HabitsEvent {
   const HabitsLoaded();
+}
+
+/// Reloads from storage without transitioning to the loading state —
+/// used by pull-to-refresh so the existing list stays visible.
+class HabitsRefreshed extends HabitsEvent {
+  const HabitsRefreshed();
 }
 
 class HabitAdded extends HabitsEvent {

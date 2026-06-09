@@ -15,6 +15,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       : _repository = repository,
         super(const HabitsState()) {
     on<HabitsLoaded>(_onLoaded);
+    on<HabitsRefreshed>(_onRefreshed);
     on<HabitAdded>(_onAdded);
     on<HabitUpdated>(_onUpdated);
     on<HabitArchiveToggled>(_onArchiveToggled);
@@ -30,6 +31,10 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     _emitFromRepository(emit);
   }
 
+  void _onRefreshed(HabitsRefreshed event, Emitter<HabitsState> emit) {
+    _emitFromRepository(emit);
+  }
+
   Future<void> _onAdded(HabitAdded event, Emitter<HabitsState> emit) async {
     final habit = await _repository.addHabit(
       name: event.name,
@@ -39,7 +44,9 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       reminderHour: event.reminderHour,
       reminderMinute: event.reminderMinute,
     );
-    await _syncReminders(habit);
+    try {
+      await _syncReminders(habit);
+    } catch (_) {}
     _emitFromRepository(emit);
   }
 
@@ -54,7 +61,9 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       reminderMinute: event.reminderMinute,
       clearReminder: event.clearReminder,
     );
-    await _syncReminders(event.habit);
+    try {
+      await _syncReminders(event.habit);
+    } catch (_) {}
     _emitFromRepository(emit);
   }
 
@@ -67,12 +76,16 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     } else {
       await _repository.archiveHabit(event.habit);
     }
-    await _syncReminders(event.habit);
+    try {
+      await _syncReminders(event.habit);
+    } catch (_) {}
     _emitFromRepository(emit);
   }
 
   Future<void> _onDeleted(HabitDeleted event, Emitter<HabitsState> emit) async {
-    await NotificationService.cancelForHabit(event.habit);
+    try {
+      await NotificationService.cancelForHabit(event.habit);
+    } catch (_) {}
     await _repository.deleteHabit(event.habit);
     _emitFromRepository(emit);
   }
