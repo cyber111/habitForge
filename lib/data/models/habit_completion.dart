@@ -18,6 +18,7 @@ class HabitCompletion extends HiveObject {
   });
 
   /// Storage key: "habitId_2024-06-15" — normalized to a date-only string.
+  @override
   String get key => storageKey(habitId, date);
 
   static String storageKey(String habitId, DateTime date) {

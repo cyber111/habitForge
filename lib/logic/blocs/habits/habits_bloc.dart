@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/models/habit.dart';
 import '../../../data/models/habit_completion.dart';
 import '../../../data/repositories/habit_repository.dart';
+import '../../../data/services/notification_service.dart';
 import '../../helpers/streak_calculator.dart';
 
 part 'habits_event.dart';
@@ -30,7 +31,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
   }
 
   Future<void> _onAdded(HabitAdded event, Emitter<HabitsState> emit) async {
-    await _repository.addHabit(
+    final habit = await _repository.addHabit(
       name: event.name,
       emoji: event.emoji,
       colorIndex: event.colorIndex,
@@ -38,6 +39,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       reminderHour: event.reminderHour,
       reminderMinute: event.reminderMinute,
     );
+    await _syncReminders(habit);
     _emitFromRepository(emit);
   }
 
@@ -52,6 +54,7 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
       reminderMinute: event.reminderMinute,
       clearReminder: event.clearReminder,
     );
+    await _syncReminders(event.habit);
     _emitFromRepository(emit);
   }
 
@@ -64,10 +67,12 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     } else {
       await _repository.archiveHabit(event.habit);
     }
+    await _syncReminders(event.habit);
     _emitFromRepository(emit);
   }
 
   Future<void> _onDeleted(HabitDeleted event, Emitter<HabitsState> emit) async {
+    await NotificationService.cancelForHabit(event.habit);
     await _repository.deleteHabit(event.habit);
     _emitFromRepository(emit);
   }
@@ -85,6 +90,11 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
     Emitter<HabitsState> emit,
   ) {
     emit(state.copyWith(selectedDate: event.date));
+  }
+
+  Future<void> _syncReminders(Habit habit) async {
+    final enabled = await NotificationService.isEnabled();
+    await NotificationService.syncForHabit(habit, enabled: enabled);
   }
 
   void _emitFromRepository(Emitter<HabitsState> emit) {
